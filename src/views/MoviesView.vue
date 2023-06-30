@@ -16,7 +16,13 @@
     <div class="item-list">
       <div class="card" v-for="(item, key) in itemList" :key="key">
         <div class="card__img">
-          <img :src="mediaURL + item.poster_path" alt="{{ item.title }}" />
+          <img
+            class="lazyload"
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP08ir4DwAD7wIFQDwd0wAAAABJRU5ErkJggg=="
+            data-sizes="auto"
+            :data-src="mediaURL + item.poster_path"
+            :alt="item.title"
+          />
         </div>
         <div class="card__info">
           <h3>{{ item.title }}</h3>
@@ -29,6 +35,9 @@
 
 <script lang="ts">
 import axios from 'axios'
+import 'lazysizes'
+import 'lazysizes/plugins/attrchange/ls.attrchange'
+import 'lazysizes/plugins/respimg/ls.respimg'
 const TMDB_API_URL = import.meta.env.VITE_API_URL
 const TMDB_API_KEY = import.meta.env.VITE_API_KEY
 const TMDB_MEDIA_URL = import.meta.env.VITE_MEDIA_URL
@@ -102,21 +111,36 @@ export default {
 }
 .main-view {
   .item-list {
-    @apply grid grid-cols-8 gap-4;
+    @apply grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4;
     .card {
       @apply flex flex-col rounded-xl overflow-hidden cursor-pointer;
       &:hover {
         .card__img {
-          scale: 1.1;
+          scale: 1.05;
         }
       }
       &__img {
-        @apply transition-all;
+        @apply transition-all overflow-hidden relative;
+        padding-top: 150%;
+        img {
+          @apply absolute inset-0;
+          min-width: 100%;
+          min-height: 100%;
+          object-fit: cover;
+          object-position: center;
+        }
       }
       &__info {
         @apply p-2 bg-slate-800 h-full flex flex-col justify-between relative z-20;
+        h3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          -webkit-box-orient: vertical;
+        }
         span {
-          @apply text-sm opacity-50;
+          @apply mt-4 text-sm opacity-50;
         }
       }
     }
